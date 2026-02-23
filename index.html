@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Solar System - Planetary Guide</title>
+    <meta name="description" content="Explore all of the 8 planets.">
+
+    <style>
+        /* --- Reset & Base Styles --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0d17;
+            color: #d0d6f9;
+            line-height: 1.85;
+        }
+
+        /* --- Background Stars --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            z-index: -1;
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Header --- */
+        header {
+            text-align: center;
+            padding: 80px 0 60px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        h1 {
+            font-size: 4rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background: linear-gradient(to right, #fff, #a0a0a0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #8892b0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* --- Planet Sections --- */
+        .planet-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            padding: 80px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .planet-section:nth-child(even) {
+            direction: rtl;
+        }
+
+        .planet-section:nth-child(even) .planet-content {
+            direction: ltr;
+        }
+
+        .planet-image {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: transform 0.4s ease;
+        }
+
+        .planet-image:hover {
+            transform: scale(1.03);
+        }
+
+        .planet-image img {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+        }
+
+        .planet-content h2 {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .planet-content h2 span {
+            color: #8892b0;
+            font-size: 1rem;
+            display: block;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .planet-text {
+            margin-bottom: 22px;
+            font-size: 1.12rem;
+            line-height: 1.85;
+            max-width: 95%;
+            color: #c7ccdf;
+        }
+
+        /* --- Stats Grid (Gray Box) --- */
+        .stats-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 30px;
+            background: rgba(255,255,255,0.05);
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+        }
+
+        .stat-label {
+            color: #8892b0;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .stat-value {
+            color: white;
+            font-weight: bold;
+        }
+
+        /* --- COOL VISUALS INSIDE GRAY BOX --- */
+
+        /* Percentage Bars */
+        .percent-item {
+            margin-bottom: 18px;
+        }
+        .percent-item span {
+            font-size: 0.9rem;
+            color: #8892b0;
+        }
+        .bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #7928ca);
+            border-radius: 10px;
+            animation: fillAnim 1.5s ease-out;
+        }
+        @keyframes fillAnim {
+            from { width: 0; }
+        }
+
+        /* Circular Meters */
+        .circle-wrapper {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .circle {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: conic-gradient(#00d4ff calc(var(--p) * 1%), rgba(255,255,255,0.1) 0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            color: white;
+            font-size: 1.2rem;
+            flex-direction: column;
+            --p: 0;
+            animation: loadCircle 1.5s forwards ease-out;
+        }
+        .circle::before {
+            content: "";
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: #0b0d17;
+            border-radius: 50%;
+        }
+        .circle span, .circle p {
+            z-index: 2;
+        }
+        .circle p {
+            font-size: 0.75rem;
+            margin-top: 6px;
+            color: #8892b0;
+        }
+        @keyframes loadCircle {
+            from { --p: 0; }
+            to { --p: attr(data-percent); }
+        }
+
+        /* Glowing Bars */
+        .glow-item {
+            margin-bottom: 20px;
+        }
+        .glow-item label {
+            font-size: 0.9rem;
+            color: #8892b0;
+        }
+        .glow-bar {
+            width: 100%;
+            height: 14px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin-top: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        .glow-bar::after {
+            content: "";
+            position: absolute;
+            height: 100%;
+            width: var(--level);
+            background: linear-gradient(90deg, #ff0080, #00d4ff);
+            box-shadow: 0 0 15px #00d4ff;
+            border-radius: 10px;
+            animation: glowFill 1.5s ease-out;
+        }
+        @keyframes glowFill {
+            from { width: 0; }
+        }
+
+        /* --- Fact Section --- */
+        .fact-container {
+            background: linear-gradient(135deg, #1a1f35 0%, #0b0d17 100%);
+            padding: 80px 20px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .fact-box h2 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+
+        .cosmic-button {
+            background: linear-gradient(45deg, #ff0080, #7928ca);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cosmic-button:hover {
+            transform: translateY(-3px);
+        }
+
+        #fact-display {
+            margin-top: 30px;
+            font-size: 1.4rem;
+            color: #00d4ff;
+            min-height: 60px;
+            font-style: italic;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #fact-display.visible {
+            opacity: 1;
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 900px) {
+            .planet-section {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .planet-section:nth-child(even) {
+                direction: ltr;
+            }
+            h1 { font-size: 2.5rem; }
+            .planet-image img { height: 300px; }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="container">
+        <h1>Solar System</h1>
+        <p class="subtitle">A journey through the infinite cosmos. Explore the 8 magnificent planets that orbit our Sun.</p>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- MERCURY -->
+    <section class="planet-section">
+        <div class="planet-image">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Mercury_in_true_color.jpg/960px-Mercury_in_true_color.jpg">
+        </div>
+
+        <div class="planet-content">
+            <h2><span>01</span> Mercury</h2>
+
+            <p class="planet-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <p class="planet-text">
+                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </p>
+
+            <div class="stats-grid">
+
+                <div class="stat-row">
+                    <div class="stat-label">Orbit</div>
+                    <div class="stat-value">88 Days</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Temperature</div>
+                    <div class="stat-value">167°C</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Moons</div>
+                    <div class="stat-value">0</div>
+                </div>
+
+                <!-- VISUALS INSIDE GRAY BOX -->
+                <div class="percent-item">
+                    <span>Surface Gravity</span>
+                    <div class="bar"><div class="fill" style="width: 38%;"></div></div>
+                </div>
+
+
+                <div class="glow-item">
+                    <label>Radiation Level</label>
+                    <div class="glow-bar" style="--level: 70%;"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- VENUS -->
+    <section class="planet-section">
+        <div class="planet-image">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Venus_2_Approach_Image.jpg/960px-Venus_2_Approach_Image.jpg">
+        </div>
+
+        <div class="planet-content">
+            <h2><span>02</span> Venus</h2>
+
+            <p class="planet-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <p class="planet-text">
+                Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius turpis et commodo pharetra.
+            </p>
+
+            <div class="stats-grid">
+
+                <div class="stat-row">
+                    <div class="stat-label">Orbit</div>
+                    <div class="stat-value">225 Days</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Temperature</div>
+                    <div class="stat-value">464°C</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Moons</div>
+                    <div class="stat-value">0</div>
+                </div>
+
+                <!-- VISUALS -->
+                <div class="percent-item">
+                    <span>Surface Pressure</span>
+                    <div class="bar"><div class="fill" style="width: 95%;"></div></div>
+                </div>
+
+
+                <div class="glow-item">
+                    <label>Atmospheric Toxicity</label>
+                    <div class="glow-bar" style="--level: 90%;"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- EARTH -->
+    <section class="planet-section">
+        <div class="planet-image">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/The_Blue_Marble%2C_AS17-148-22727.jpg/960px-The_Blue_Marble%2C_AS17-148-22727.jpg">
+        </div>
+
+        <div class="planet-content">
+            <h2><span>03</span> Earth</h2>
+
+            <p class="planet-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <p class="planet-text">
+                Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius turpis et commodo pharetra.
+            </p>
+
+            <div class="stats-grid">
+
+                <div class="stat-row">
+                    <div class="stat-label">Orbit</div>
+                    <div class="stat-value">365.25 Days</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Temperature</div>
+                    <div class="stat-value">15°C</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Moons</div>
+                    <div class="stat-value">1</div>
+                </div>
+
+                <!-- VISUALS -->
+                <div class="percent-item">
+                    <span>Water Coverage</span>
+                    <div class="bar"><div class="fill" style="width: 71%;"></div></div>
+                </div>
+
+
+                <div class="glow-item">
+                    <label>Oxygen Level</label>
+                    <div class="glow-bar" style="--level: 21%;"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- MARS -->
+    <section class="planet-section">
+        <div class="planet-image">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png/960px-Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png">
+        </div>
+
+        <div class="planet-content">
+            <h2><span>04</span> Mars</h2>
+
+            <p class="planet-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <p class="planet-text">
+                Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius turpis et commodo pharetra.
+            </p>
+
+            <div class="stats-grid">
+
+                <div class="stat-row">
+                    <div class="stat-label">Orbit</div>
+                    <div class="stat-value">687 Days</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Temperature</div>
+                    <div class="stat-value">-65°C</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Moons</div>
+                    <div class="stat-value">2</div>
+                </div>
+
+                                <!-- VISUALS -->
+                <div class="percent-item">
+                    <span>Water Presence</span>
+                    <div class="bar"><div class="fill" style="width: 5%;"></div></div>
+                </div>
+
+                <div class="glow-item">
+                    <label>Radiation Level</label>
+                    <div class="glow-bar" style="--level: 80%;"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- JUPITER -->
+    <section class="planet-section">
+        <div class="planet-image">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Jupiter_OPAL_2024.png/960px-Jupiter_OPAL_2024.png">
+        </div>
+
+        <div class="planet-content">
+            <h2><span>05</span> Jupiter</h2>
+
+            <p class="planet-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <p class="planet-text">
+                Integer in mauris eu nibh euismod gravida. Curabitur pretium tincidunt lacus.
+            </p>
+
+            <div class="stats-grid">
+
+                <div class="stat-row">
+                    <div class="stat-label">Orbit</div>
+                    <div class="stat-value">12 Years</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Temperature</div>
+                    <div class="stat-value">-110°C</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Moons</div>
+                    <div class="stat-value">79</div>
+                </div>
+
+                <!-- VISUALS -->
+                <div class="percent-item">
+                    <span>Storm Activity</span>
+                    <div class="bar"><div class="fill" style="width: 98%;"></div></div>
+                </div>
+
+                <div class="glow-item">
+                    <label>Magnetic Field</label>
+                    <div class="glow-bar" style="--level: 100%;"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SATURN -->
+    <section class="planet-section">
+        <div class="planet-image">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Saturn_during_Equinox.jpg">
+        </div>
+
+        <div class="planet-content">
+            <h2><span>06</span> Saturn</h2>
+
+            <p class="planet-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <p class="planet-text">
+                Curabitur pretium tincidunt lacus. Nulla gravida orci a odio.
+            </p>
+
+            <div class="stats-grid">
+
+                <div class="stat-row">
+                    <div class="stat-label">Orbit</div>
+                    <div class="stat-value">29 Years</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Temperature</div>
+                    <div class="stat-value">-140°C</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Moons</div>
+                    <div class="stat-value">83</div>
+                </div>
+
+                <!-- VISUALS -->
+                <div class="percent-item">
+                    <span>Ring Brightness</span>
+                    <div class="bar"><div class="fill" style="width: 92%;"></div></div>
+                </div>
+
+                <div class="glow-item">
+                    <label>Wind Speed</label>
+                    <div class="glow-bar" style="--level: 75%;"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- URANUS -->
+    <section class="planet-section">
+        <div class="planet-image">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/Uranus_Voyager2_color_calibrated.png">
+        </div>
+
+        <div class="planet-content">
+            <h2><span>07</span> Uranus</h2>
+
+            <p class="planet-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <p class="planet-text">
+                Nulla gravida orci a odio. Nullam varius turpis et commodo pharetra.
+            </p>
+
+            <div class="stats-grid">
+
+                <div class="stat-row">
+                    <div class="stat-label">Orbit</div>
+                    <div class="stat-value">84 Years</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Temperature</div>
+                    <div class="stat-value">-195°C</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Moons</div>
+                    <div class="stat-value">27</div>
+                </div>
+
+                <!-- VISUALS -->
+                <div class="percent-item">
+                    <span>Axial Tilt</span>
+                    <div class="bar"><div class="fill" style="width: 98%;"></div></div>
+                </div>
+
+
+                <div class="glow-item">
+                    <label>Wind Speed</label>
+                    <div class="glow-bar" style="--level: 90%;"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- NEPTUNE -->
+    <section class="planet-section">
+        <div class="planet-image">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/56/Neptune_Full.jpg">
+        </div>
+
+        <div class="planet-content">
+            <h2><span>08</span> Neptune</h2>
+
+            <p class="planet-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <p class="planet-text">
+                Nullam varius turpis et commodo pharetra. Integer in mauris eu nibh euismod gravida.
+            </p>
+
+            <div class="stats-grid">
+
+                <div class="stat-row">
+                    <div class="stat-label">Orbit</div>
+                    <div class="stat-value">165 Years</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Temperature</div>
+                    <div class="stat-value">-200°C</div>
+                </div>
+
+                <div class="stat-row">
+                    <div class="stat-label">Moons</div>
+                    <div class="stat-value">14</div>
+                </div>
+
+                <!-- VISUALS -->
+                <div class="percent-item">
+                    <span>Wind Speed</span>
+                    <div class="bar"><div class="fill" style="width: 100%;"></div></div>
+                </div>
+
+
+                <div class="glow-item">
+                    <label>Ice Content</label>
+                    <div class="glow-bar" style="--level: 85%;"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<!-- RANDOM FACT SECTION -->
+<section class="fact-container">
+    <div class="fact-box">
+        <h2>Cosmic Random Fact</h2>
+        <button class="cosmic-button" onclick="generateFact()">Reveal a Space Fact</button>
+        <div id="fact-display"></div>
+    </div>
+</section>
+
+<footer>
+    © 2024 Cosmic Explorations — Journey Through the Solar System
+</footer>
+
+<script>
+    const facts = [
+        "A day on Venus is longer than a year on Venus.",
+        "Jupiter is so massive it could fit all other planets inside it.",
+        "Mars has the largest volcano in the solar system: Olympus Mons.",
+        "Neptune has the fastest winds in the solar system, reaching 1,200 mph.",
+        "Saturn could float in water because it’s mostly made of gas.",
+        "Uranus rotates on its side, unlike any other planet.",
+        "Mercury has no atmosphere to retain heat, causing extreme temperature swings.",
+        "Earth is the only planet known to support life — so far."
+    ];
+
+    function generateFact() {
+        const factBox = document.getElementById("fact-display");
+        const randomFact = facts[Math.floor(Math.random() * facts.length)];
+        factBox.textContent = randomFact;
+        factBox.classList.add("visible");
+    }
+</script>
+
+<p class="learn-more">
+    Learn more stuff here: 
+    <a href="https://example.com/your-page" target="_blank">Visit this page</a>
+</p>
+
+</body>
+</html>
